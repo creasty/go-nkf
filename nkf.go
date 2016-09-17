@@ -81,7 +81,7 @@ func Guess(str string) (Encoding, error) {
 	if coutput == nil {
 		return ENCODING_UNKNOWN, noMemoryError
 	}
-	defer C.free(unsafe.Pointer(coutput))
+	// no free for const char *
 
 	code := C.GoString((*C.char)(unsafe.Pointer(coutput)))
 
