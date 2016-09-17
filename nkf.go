@@ -1,11 +1,10 @@
 package nkf
 
 /*
+#cgo CFLAGS: -I .
+
 #include <stdlib.h>
 #include "nkf.h"
-
-#cgo CFLAGS: -I .
-#cgo LDFLAGS: -L . -lnkf
 */
 import "C"
 
