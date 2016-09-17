@@ -10,6 +10,7 @@ import "C"
 
 import (
 	"errors"
+	"strings"
 	"unsafe"
 )
 
@@ -70,7 +71,9 @@ func Convert(str string, options string) (string, error) {
 	}
 	defer C.free(unsafe.Pointer(coutput))
 
-	return C.GoString((*C.char)(unsafe.Pointer(coutput))), nil
+	output := C.GoString((*C.char)(unsafe.Pointer(coutput)))
+	output = strings.TrimRight(output, "\x00")
+	return output, nil
 }
 
 func Guess(str string) (Encoding, error) {
@@ -83,7 +86,6 @@ func Guess(str string) (Encoding, error) {
 	}
 	// no free for const char *
 
-	code := C.GoString((*C.char)(unsafe.Pointer(coutput)))
-
-	return Encoding(code), nil
+	output := C.GoString((*C.char)(unsafe.Pointer(coutput)))
+	return Encoding(output), nil
 }
