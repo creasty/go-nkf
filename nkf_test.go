@@ -42,3 +42,7 @@ func TestConvert(t *testing.T) {
 		}
 	}
 }
+
+func TestGuess(t *testing.T) {
+	t.Skip()
+}
