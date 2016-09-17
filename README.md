@@ -1,5 +1,28 @@
 go-nkf
 ======
 
-- https://github.com/fumiyas/python-nkf/blob/master/nkf.c
-- https://github.com/ruby/ruby/blob/trunk/ext/nkf/nkf.c
+nkf binding for Golang
+
+
+Usage
+-----
+
+### `Convert(str string, options string) (string, error)`
+
+```go
+str, err := nkf.Convert("あいうえお０１２３", "-m0Z1 -w --katakana")
+if err != nil {
+	fmt.Println(str)
+	//=> アイウエオ0123
+}
+```
+
+### `Guess(str string) (Encoding, error)`
+
+```go
+str, err := nkf.Guess("abc")
+if err != nil {
+	fmt.Println(str)
+	//=> ASCII
+}
+```
