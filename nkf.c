@@ -29,6 +29,7 @@ gonkf_putchar(int c);
 
 // Load library
 #define PERL_XS 1
+#include "nkf/config.h"
 #include "nkf/utf8tbl.c"
 #include "nkf/nkf.c"
 
