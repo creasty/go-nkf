@@ -1,8 +1,11 @@
 CC := gcc
-CFLAGS := -fPIC -O2
+CFLAGS := -g -fPIC -O2
 
 .c.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-nkf: nkf.o nkf.go
+libnkf.so: nkf.o
+	$(CC) $(CFLAGS) -shared -o libnkf.so nkf.o
+
+nkf: libnkf.so nkf.go
 	@go build nkf.go
