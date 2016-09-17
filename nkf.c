@@ -1,24 +1,13 @@
+#include "nkf.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <setjmp.h>
-
-#undef getc
-#define getc(f) \
-    gonkf_getc(f)
-#undef ungetc
-#define ungetc(c,f) \
-    gonkf_ungetc(c,f)
-#undef putchar
-#define putchar(c) \
-    gonkf_putchar(c)
-
-#undef TRUE
-#undef FALSE
 
 // Load library
 #define PERL_XS 1
 #include "nkf/utf8tbl.c"
 #include "nkf/nkf.c"
-
-#include "nkf.h"
 
 
 /*=== Utils
@@ -116,7 +105,7 @@ gonkf_convert(unsigned char *str, int str_size, char *opts, int opts_size)
 
     if (setjmp(panic) == 0) {
         reinit();
-        options(opts);
+        options((unsigned char *)opts);
         kanji_convert(NULL);
     } else {
         free(gonkf_obuf);
