@@ -31,6 +31,9 @@ gonkf_putchar(int c);
 #include "nkf/utf8tbl.c"
 #include "nkf/nkf.c"
 
+#define estimated_output_size(input_size) \
+    ((input_size) * 1.5 + 256)
+
 
 /*=== Utils
 ==============================================================================================*/
@@ -108,7 +111,7 @@ unsigned char *
 gonkf_convert(unsigned char *str, int str_size, char *opts, int opts_size)
 {
     gonkf_isize = str_size + 1;
-    gonkf_osize = gonkf_isize * 1.5 + 256;
+    gonkf_osize = estimated_output_size(gonkf_isize);
     gonkf_obuf  = (unsigned char *)malloc(gonkf_osize);
 
     if (gonkf_obuf == NULL) {
@@ -130,7 +133,6 @@ gonkf_convert(unsigned char *str, int str_size, char *opts, int opts_size)
         kanji_convert(NULL);
     } else {
         free(gonkf_obuf);
-        gonkf_no_memory_error();
         return NULL;
     }
 
