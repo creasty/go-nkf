@@ -1,6 +1,8 @@
 go-nkf
 ======
 
+[![Build Status](https://travis-ci.org/creasty/go-nkf.svg?branch=master)](https://travis-ci.org/creasty/go-nkf)
+
 nkf binding for Golang
 
 
