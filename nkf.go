@@ -11,10 +11,9 @@ import "C"
 import (
 	"errors"
 	"strings"
+	"sync"
 	"unsafe"
 )
-
-var noMemoryError = errors.New("failed to allocate memory")
 
 type Encoding string
 
@@ -58,7 +57,15 @@ const (
 	ENCODING_UNKNOWN          Encoding = "UNKNOWN"
 )
 
+var (
+	noMemoryError = errors.New("failed to allocate memory")
+	lock          = sync.Mutex{}
+)
+
 func Convert(str string, options string) (string, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	cstr := (*C.uchar)(unsafe.Pointer(C.CString(str)))
 	defer C.free(unsafe.Pointer(cstr))
 
@@ -77,6 +84,9 @@ func Convert(str string, options string) (string, error) {
 }
 
 func Guess(str string) (Encoding, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	cstr := (*C.uchar)(unsafe.Pointer(C.CString(str)))
 	defer C.free(unsafe.Pointer(cstr))
 
