@@ -1,0 +1,12 @@
+language: go
+go:       1.7
+
+services:
+  - docker
+
+branches:
+  only:
+    - master
+
+script:
+  - go test -v .
