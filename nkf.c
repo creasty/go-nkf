@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <setjmp.h>
 #include <stddef.h>
+#include <setjmp.h>
 
 static int
 gonkf_getc(FILE *f);
@@ -14,6 +14,11 @@ gonkf_ungetc(int c, FILE *f);
 static void
 gonkf_putchar(int c);
 
+#define BUFFER_STRETCH 2
+
+
+/*  Override and load library
+-----------------------------------------------*/
 #undef getc
 #define getc(f) \
     gonkf_getc(f)
@@ -27,35 +32,25 @@ gonkf_putchar(int c);
 #undef TRUE
 #undef FALSE
 
-// Load library
 #define PERL_XS 1
 #include "nkf/config.h"
 #include "nkf/utf8tbl.c"
 #include "nkf/nkf.c"
 
-#define estimated_output_size(input_size) \
-    ((input_size) * 1.5 + 256)
-
 
 /*=== Utils
 ==============================================================================================*/
-static int gonkf_isize;
-static int gonkf_osize;
 static unsigned char *gonkf_ibuf;
 static unsigned char *gonkf_obuf;
-static int gonkf_icount;
-static int gonkf_ocount;
 static unsigned char *gonkf_iptr;
 static unsigned char *gonkf_optr;
+static int gonkf_isize;
+static int gonkf_osize;
+static int gonkf_icount;
+static int gonkf_ocount;
 
 static jmp_buf panic;
 static int gonkf_guess_flag;
-
-static void
-gonkf_no_memory_error()
-{
-    // printf("failed to allocate memory\n");
-}
 
 static int
 gonkf_getc(FILE *f)
@@ -88,11 +83,10 @@ gonkf_putchar(int c)
     if (gonkf_ocount--) {
         *gonkf_optr++ = c;
     } else {
-        size_t size      = gonkf_osize + gonkf_osize;
+        size_t size      = gonkf_osize * BUFFER_STRETCH;
         unsigned char *p = (unsigned char *)realloc(gonkf_obuf, size + 1);
 
         if (gonkf_obuf == NULL){
-            gonkf_no_memory_error();
             longjmp(panic, 1);
         }
 
@@ -110,14 +104,14 @@ gonkf_putchar(int c)
 /*=== Bindings
 ==============================================================================================*/
 unsigned char *
-gonkf_convert(unsigned char *str, int str_size, char *opts, int opts_size)
+gonkf_convert(unsigned char *str, int str_size, unsigned char *opts, int opts_size)
 {
     gonkf_isize = str_size + 1;
-    gonkf_osize = estimated_output_size(gonkf_isize);
-    gonkf_obuf  = (unsigned char *)malloc(gonkf_osize);
+    gonkf_osize = str_size * BUFFER_STRETCH;
+    gonkf_obuf  = (unsigned char *)malloc(gonkf_osize + 1);
 
     if (gonkf_obuf == NULL) {
-        gonkf_no_memory_error();
+        // failed to allocate memory
         return NULL;
     }
 
@@ -131,9 +125,10 @@ gonkf_convert(unsigned char *str, int str_size, char *opts, int opts_size)
 
     if (setjmp(panic) == 0) {
         reinit();
-        options((unsigned char *)opts);
+        options(opts);
         kanji_convert(NULL);
     } else {
+        // failed to allocate memory
         free(gonkf_obuf);
         return NULL;
     }

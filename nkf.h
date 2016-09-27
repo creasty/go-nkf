@@ -1,10 +1,8 @@
 #ifndef __NKF_H_LOADED__
 #define __NKF_H_LOADED__
 
-#include <stdio.h>
-
 unsigned char *
-gonkf_convert(unsigned char *str, int str_size, char *opts, int opts_size);
+gonkf_convert(unsigned char *str, int str_size, unsigned char *opts, int opts_size);
 
 const char *
 gonkf_convert_guess(unsigned char *str, int str_size);

@@ -43,6 +43,22 @@ func TestConvert(t *testing.T) {
 	}
 }
 
+func TestCovertConcurrent(t *testing.T) {
+	n := 3
+	c := make(chan bool, n)
+
+	for i := 0; i < n; i++ {
+		go func() {
+			TestConvert(t)
+			c <- true
+		}()
+	}
+
+	for i := 0; i < n; i++ {
+		<-c
+	}
+}
+
 func TestGuess(t *testing.T) {
 	t.Skip()
 }
