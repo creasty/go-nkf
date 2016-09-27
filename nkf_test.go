@@ -1,6 +1,8 @@
 package nkf
 
 import (
+	"io"
+	"os/exec"
 	"testing"
 )
 
@@ -61,4 +63,38 @@ func TestCovertConcurrent(t *testing.T) {
 
 func TestGuess(t *testing.T) {
 	t.Skip()
+}
+
+func BenchmarkConvertByBinding(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Convert("ａｂｃｄＡＢＣＤ０１２３　あいうえお", "-m0Z1 -w --katakana")
+	}
+}
+
+func BenchmarkConvertByCli(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		nkfCommand("ａｂｃｄＡＢＣＤ０１２３　あいうえお", "-m0Z1 -w --katakana")
+	}
+}
+
+func nkfCommand(str string, flags ...string) string {
+	c := exec.Command("nkf", flags...)
+	stdin, err := c.StdinPipe()
+	if err != nil {
+		stdin.Close()
+		return str
+	}
+
+	if _, err := io.WriteString(stdin, str); err != nil {
+		stdin.Close()
+		return str
+	}
+
+	stdin.Close()
+	b, err := c.Output()
+	if err != nil {
+		return str
+	}
+
+	return string(b[:])
 }
