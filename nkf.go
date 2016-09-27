@@ -69,7 +69,7 @@ func Convert(str string, options string) (string, error) {
 	cstr := (*C.uchar)(unsafe.Pointer(C.CString(str)))
 	defer C.free(unsafe.Pointer(cstr))
 
-	coptions := C.CString(options)
+	coptions := (*C.uchar)(unsafe.Pointer(C.CString(options)))
 	defer C.free(unsafe.Pointer(coptions))
 
 	coutput := C.gonkf_convert(cstr, C.int(len(str)), coptions, C.int(len(options)))
